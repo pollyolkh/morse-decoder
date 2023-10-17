@@ -38,30 +38,21 @@ const MORSE_TABLE = {
 };
 
 function decode(expr) {
-    // Разбить строку на буквы
-    const letterLength = 10;
-    const letters = [];
-    for (let i = 0; i < expr.length; i += letterLength) {
-        letters.push(expr.slice(i, i + letterLength));
-    }
-
-    // Заменить '10' на точку (.) и '11' на тире (-)
-    const decodedLetters = letters.map(letter => {
-        return letter
-            .replace(/10/g, '.')
-            .replace(/11/g, '-');
+    const words = expr.split('**********');  // Разбиваем строку на слова
+    const decodedWords = words.map(word => {
+        const letters = word.match(/.{1,10}/g);  // Разбиваем слово на буквы (каждая буква закодирована 10 символами)
+        const decodedLetters = letters.map(letter => {
+            const morseLetter = letter
+                .replace(/00/g, '')  // Убираем нули
+                .replace(/10/g, '.')  // Заменяем 10 на точку
+                .replace(/11/g, '-')  // Заменяем 11 на тире
+                .replace(/0/g, '');   // Убираем оставшиеся нули
+            return MORSE_TABLE[morseLetter];  // Декодируем букву из объекта MORSE_TABLE
+        });
+        return decodedLetters.join('');  // Объединяем буквы в слово
     });
 
-    // Преобразовать каждую букву с использованием MORSE_TABLE и объединить их
-    const decodedMessage = decodedLetters.map(letter => {
-        if (letter === '**********') {
-            return ' '; // Пробел
-        } else {
-            return MORSE_TABLE[letter];
-        }
-    }).join('');
-
-    return decodedMessage;
+    return decodedWords.join(' ');  // Объединяем слова в предложение
 }
 
 module.exports = {
